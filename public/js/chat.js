@@ -1,10 +1,12 @@
-var Chat = function(id, player) {
+var Chat = function(id, player, time) {
 	this.videoId = id;
 	this.status = "loading";
 	this.skipView = false;
 	this.videoPlayer = player;
 	this.chatDelay = 2;
 	this.previousTimeOffset = -1;
+	this.time = time;
+	console.log(this.time);
 
 	this.previousMessage = '';
 	this.comboCount = 1;
@@ -18,7 +20,8 @@ var Chat = function(id, player) {
 	// sending a client-id header by default
 	$.ajaxSetup({headers: {"Client-ID" : "88bxd2ntyahw9s8ponrq2nwluxx17q"}});
 
-	$.get("https://api.twitch.tv/helix/videos?id=" + this.videoId, function(vodData) {
+	if(!time){
+		$.get("https://api.twitch.tv/helix/videos?id=" + this.videoId, function(vodData) {
 		self.recordedTime = moment(vodData["data"][0]["created_at"]).utc();
 
 		// https://dgg.overrustlelogs.net/Destinygg chatlog/March 2016/2016-03-23
@@ -40,6 +43,28 @@ var Chat = function(id, player) {
 			self.startChatStream();
 		});
 	});
+	} else {
+		self.recordedTime = moment(this.time).utc();
+
+		var overrustleLogsMonth = "https://dgg.overrustlelogs.net/Destinygg%20chatlog/" + 
+			self.recordedTime.format("MMMM") + "%20" + 
+			self.recordedTime.format("YYYY") + "/" + 
+			self.recordedTime.format("YYYY") + "-" +
+			self.recordedTime.format("MM") + "-";
+
+		var overrustleLogsDates = [
+			overrustleLogsMonth + self.recordedTime.format("DD") + ".txt",
+			overrustleLogsMonth + self.recordedTime.clone().add(1, 'days').format("DD") + ".txt"
+		];
+			
+		$.get("/chat", {
+			urls: JSON.stringify(overrustleLogsDates)
+		}, function(data) {
+			self.chat = JSON.parse(data);
+			self.startChatStream();
+		});
+	}
+	
 
 	$.get("/emotes", function(data) {
 		self.emotes = JSON.parse(data);

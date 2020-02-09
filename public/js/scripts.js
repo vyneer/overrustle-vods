@@ -1,11 +1,18 @@
 $(document).ready(function() {
     var id = getUrlParameter("id");
+    var time = getUrlParameter("time");
     var page = 1;
     //nextPage === 0 when you go to the next page, === 1 when you go back a page, === 2 when you load the first page
     var nextPage = 2;
 
-    if (id) {
+    if (id && !time) {
+        console.log("test2")
         loadPlayer(id);
+        $("#browse").hide();
+        $("#player").show();
+    } else if (id && time) {
+        console.log("test")
+        loadPlayer(id, time);
         $("#browse").hide();
         $("#player").show();
     } else {
@@ -112,11 +119,11 @@ var loadDestinyStatus = function() {
     })
 }
 
-var loadPlayer = function(id) {
+var loadPlayer = function(id, time) {
     $("#player").css("display", "flex");
 
     var player = new Twitch.Player("video-player", { video: id });
-    var chat = new Chat(id, player);
+    var chat = new Chat(id, player, time);
 
     player.addEventListener("play", function() {
         chat.startChatStream();
