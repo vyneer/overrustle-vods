@@ -53,7 +53,7 @@
 		// from https://stackoverflow.com/questions/58972512/linking-a-css-file-with-version-number-for-cache-busting
 		window.addEventListener('load', function() {
   			var head = document.querySelector('head');
-  			head.innerHTML += '<link rel="stylesheet" href="https://cdn.destiny.gg/2.13.0/emotes/emotes.css?_=' + Math.random() + '" type="text/css">';
+  			head.innerHTML += '<link rel="stylesheet" href="https://cdn.destiny.gg/emotes/emotes.css?_=' + Math.random() + '" type="text/css">';
 		});
 	</script>
 
@@ -63,6 +63,15 @@
 			regex = new RegExp('(?=[0-9])[^\/]+', 'gm');
 			replaced = url.match(regex);
 			window.location.href += "?id=" + replaced[0].replace(/[?]/gm, '&');
+		};
+	</script>
+
+	<script>
+		// only leaves numbers from the url
+		function onstreamURL(url) {
+			regex = new RegExp('(?=[0-9])[^\/]+', 'gm');
+			replaced = url.match(regex);
+			window.location.href += "onstreamchat?id=" + replaced[0].replace(/[?]/gm, '&');
 		};
 	</script>
 
@@ -84,6 +93,7 @@
 		<div id="header-links">
 			<div><input type="text" id="customUrlText" name="vodurl" placeholder="Twitch VOD url"></div>
 			<div><input id="customUrlButton" value="Submit" onclick="vodURL(document.getElementById('customUrlText').value)" type="button"></div>
+			<div><input id="onstreamUrlButton" value="On Stream Chat" onclick="onstreamURL(document.getElementById('customUrlText').value)" type="button"></div>
 			<div><a href="https://www.destiny.gg">Destiny.gg</a></div>
 			<div><a id="destiny-status" href="https://www.destiny.gg/bigscreen">Destiny is offline.</a></div>
 		</div>
