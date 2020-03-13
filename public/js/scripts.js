@@ -1,12 +1,13 @@
 $(document).ready(function() {
     var id = getUrlParameter("id");
-    var time = getUrlParameter("time");
+    var time = getUrlParameter("t");
     var page = 1;
-    //nextPage === 0 when you go to the next page, === 1 when you go back a page, === 2 when you load the first page
-    var nextPage = 2;
 
-    if (id && !time) {
-        console.log("test2")
+    if (id && time) {
+        loadPlayer(id, time);
+        $("#browse").hide();
+        $("#player").show();
+    } else if (id && !time) {
         loadPlayer(id);
         $("#browse").hide();
         $("#player").show();
@@ -16,7 +17,13 @@ $(document).ready(function() {
         $("#browse").hide();
         $("#player").show();
     } else {
-        loadVODs(nextPage);
+        // preloading all vods since twitch api pagination is inconsistent and bad >:(
+        loadVODs().then(result => {
+            allVODs = result;
+            return result.slice(0, 9);
+        }).then(nineEntries => {
+            createVodEntries(nineEntries);
+        });
         $("#player").hide();
         $("#browse").show();
     }
@@ -28,12 +35,20 @@ $(document).ready(function() {
     });
 
     $("#next-page-button").click(function() {
-        page += 1;
-        nextPage = 0;
+        if (page != Math.ceil(allVODs.length/9)) {
+            page += 1;
+            $("#page-number").text(page);
+            $("#vod-list").empty();
+            nineEntries = allVODs.slice((page-1)*9,page*9);
+            createVodEntries(nineEntries);
+        }
 
-        $("#page-number").text(page);
-        loadVODs(nextPage);
-
+        if (page === Math.ceil(allVODs.length/9)) {
+            $("#next-page-button").addClass("disabled");
+        } else {
+            $("#next-page-button").removeClass("disabled");
+        }
+        
         if (page === 1) {
             $("#previous-page-button").addClass("disabled");
         } else {
@@ -42,11 +57,18 @@ $(document).ready(function() {
     });
 
     $("#previous-page-button").click(function() {
-        nextPage = 1;
         if (page > 1) { 
             page -= 1;
             $("#page-number").text(page);
-            loadVODs(nextPage);
+            $("#vod-list").empty();
+            nineEntries = allVODs.slice((page-1)*9,page*9);
+            createVodEntries(nineEntries);
+        }
+
+        if (page === Math.ceil(allVODs.length/9)) {
+            $("#next-page-button").addClass("disabled");
+        } else {
+            $("#next-page-button").removeClass("disabled");
         }
 
         if (page === 1) {
@@ -70,40 +92,33 @@ $(document).ready(function() {
     });
 });
 
+var allVODs = [];
+
+async function loadVODs() {
+    vodArray = [];
+    var destinyVODsURL = "https://api.twitch.tv/helix/videos/?user_id=" + destinyUserID + "&first=100&type=archive";
+    let response = await fetch(destinyVODsURL, { headers: { 'Client-ID': clientID}});
+    let data = await response.json();
+    pageCursor = data.pagination.cursor;
+    vodArray.push(...data.data);
+    // if there are more than 100 vods, check next page and add everything there to the array; repeat until done
+    while (data.data.length === 100 && pageCursor != ("" || null)) {
+        destinyVODsURL = "https://api.twitch.tv/helix/videos/?user_id=" + destinyUserID + "&first=100&type=archive&after=" + pageCursor;
+        response = await fetch(destinyVODsURL, { headers: { 'Client-ID': clientID}});
+        data = await response.json();
+        pageCursor = data.pagination.cursor;
+        vodArray.push(...data.data);
+    };
+    return vodArray;
+};
+
 var destinyUserID = 18074328;
 
 var pageCursor = 0;
 
-$.ajaxSetup({headers: {"Client-ID" : "88bxd2ntyahw9s8ponrq2nwluxx17q"}})
+var clientID = "88bxd2ntyahw9s8ponrq2nwluxx17q";
 
-var loadVODs = function(nextPage) {
-    if (nextPage === 2) {
-        var destinyVodsUrl = "https://api.twitch.tv/helix/videos/?user_id=" + destinyUserID + "&first=9&type=archive";
-
-        $.get(destinyVodsUrl, function(data) {
-            $("#vod-list").empty();
-            createVodEntries(data);
-            pageCursor = data.pagination.cursor;
-        });
-    } else if (nextPage === 0) {
-        var destinyVodsUrl = "https://api.twitch.tv/helix/videos/?user_id=" + destinyUserID + "&first=9&type=archive&after=" + pageCursor;
-
-        $.get(destinyVodsUrl, function(data) {
-            $("#vod-list").empty();
-            createVodEntries(data);
-            pageCursor = data.pagination.cursor;
-        });
-    } else {
-        var destinyVodsUrl = "https://api.twitch.tv/helix/videos/?user_id=" + destinyUserID + "&first=9&type=archive&before=" + pageCursor;
-
-        $.get(destinyVodsUrl, function(data) {
-            $("#vod-list").empty();
-            createVodEntries(data);
-            pageCursor = data.pagination.cursor;
-        });
-    }
-    
-}
+$.ajaxSetup({headers: {"Client-ID" : clientID}});
 
 var loadDestinyStatus = function() {
     var destinyStatusUrl = "https://api.twitch.tv/helix/streams?user_login=destiny";
@@ -122,8 +137,8 @@ var loadDestinyStatus = function() {
 var loadPlayer = function(id, time) {
     $("#player").css("display", "flex");
 
-    var player = new Twitch.Player("video-player", { video: id });
-    var chat = new Chat(id, player, time);
+    var player = new Twitch.Player("video-player", { video: id , time: time });
+    var chat = new Chat(id, player);
 
     player.addEventListener("play", function() {
         chat.startChatStream();
@@ -137,7 +152,7 @@ var loadPlayer = function(id, time) {
 }
 
 var createVodEntries = function(vodData) {
-    vodData.data.forEach(function(vod) {
+    vodData.forEach(function(vod) {
         createVodEntry({
             id: vod.id, 
             title: vod.title, 
