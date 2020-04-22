@@ -19,24 +19,19 @@ var Chat = function(id, player) {
 	$.ajaxSetup({headers: {"Client-ID" : "88bxd2ntyahw9s8ponrq2nwluxx17q"}});
 
 	$.get("https://api.twitch.tv/helix/videos?id=" + this.videoId, function(vodData) {
+		self.hReplace = new RegExp('([h])', 'gm');
+		self.mReplace = new RegExp('([m])', 'gm');
+		self.sReplace = new RegExp('([s])', 'gm');
 		self.recordedTime = moment(vodData["data"][0]["created_at"]).utc();
-
-		// https://dgg.overrustlelogs.net/Destinygg chatlog/March 2016/2016-03-23
-		var overrustleLogsMonth = "https://dgg.overrustlelogs.net/Destinygg%20chatlog/" + 
-			self.recordedTime.format("MMMM") + "%20" + 
-			self.recordedTime.format("YYYY") + "/" + 
-			self.recordedTime.format("YYYY") + "-" +
-			self.recordedTime.format("MM") + "-";
-
-		var overrustleLogsDates = [
-			overrustleLogsMonth + self.recordedTime.format("DD") + ".txt",
-			overrustleLogsMonth + self.recordedTime.clone().add(1, 'days').format("DD") + ".txt"
-		];
+		self.durationString = "PT" + vodData["data"][0]["duration"].replace(self.hReplace, 'H').replace(self.mReplace, 'M').replace(self.sReplace, 'S');
+		self.duration = moment.duration(self.durationString).asSeconds();
+		self.endTime = moment(self.recordedTime).add(self.duration, 'seconds').utc();
 			
-		$.get("/chat", {
-			urls: JSON.stringify(overrustleLogsDates)
+		$.get("https://vyneer.me/logs", {
+			start: moment(self.recordedTime).format(),
+			end: moment(self.endTime).format()
 		}, function(data) {
-			self.chat = JSON.parse(data);
+			self.chat = data;
 			self.startChatStream();
 		});
 	});
@@ -141,10 +136,10 @@ var Chat = function(id, player) {
 
 						$('#chat-stream .chat-line').last().remove();
 						var comboMessage = self._renderComboMessage(self.previousMessage, self.comboCount);
-						self._renderChatMessage(null, comboMessage);
+						self._renderChatMessage(null, comboMessage, null);
 					} else {
 						self.comboCount = 1;
-						self._renderChatMessage(chatLine.username, self._formatMessage(chatLine.message));
+						self._renderChatMessage(chatLine.nick, self._formatMessage(chatLine.message), chatLine.features);
 					}
 
 					self.previousMessage = chatLine.message;
