@@ -85,13 +85,28 @@ var Chat = function(id, player) {
 			"<span class='combo'>C-C-C-COMBO</span>";
 	}
 
-	this._renderChatMessage = function(username, message) {
+	this._renderChatMessage = function(username, message, features) {
 		var usernameField = "";
+		var featuresField = ""
+		if (features.slice(1,-1) != "") {
+			let flairArray = features.slice(1,-1).split(",");
+			let flairList = "";
+			flairArray.forEach(function(flair) {
+				flairList += "<i class='flair " + flair + "'></i>";
+			});
+			featuresField =  "<span class='features'>" + flairList + "</span>";
+		}
 		if (username) {
-			usernameField =  "<span class='username user-" + username + "'>" + username + "</span>: ";
+			let flairArray = features.slice(1,-1).split(",");
+			let flairList = ""
+			flairArray.forEach(function(flair) {
+				flairList += flair + " "
+			});
+			usernameField =  "<span class='user " + flairList + "'>" + username + "</span>: ";
 		}
 
 		$("#chat-stream").append("<div class='chat-line'>" + 
+			featuresField +
 			usernameField + 
 			"<span class='message'>" +
 		  message + "</span></div>");		
