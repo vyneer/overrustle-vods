@@ -27,9 +27,9 @@ var Chat = function(id, player) {
 		self.duration = moment.duration(self.durationString).asSeconds();
 		self.endTime = moment(self.recordedTime).add(self.duration, 'seconds').utc();
 			
-		$.get("https://vyneer.me/logs", {
-			start: moment(self.recordedTime).format(),
-			end: moment(self.endTime).format()
+		$.get("https://vyneer.me/api/logs", {
+			from: moment(self.recordedTime).format(),
+			to: moment(self.endTime).format()
 		}, function(data) {
 			self.chat = data;
 			self.startChatStream();
@@ -154,7 +154,7 @@ var Chat = function(id, player) {
 						self._renderChatMessage(null, comboMessage, null);
 					} else {
 						self.comboCount = 1;
-						self._renderChatMessage(chatLine.nick, self._formatMessage(chatLine.message), chatLine.features);
+						self._renderChatMessage(chatLine.username, self._formatMessage(chatLine.message), chatLine.features);
 					}
 
 					self.previousMessage = chatLine.message;
