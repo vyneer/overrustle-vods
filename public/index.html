@@ -16,11 +16,11 @@
 
 	<script src= "https://player.twitch.tv/js/embed/v1.js"></script>
 	<script async defer src="https://buttons.github.io/buttons.js"></script>
+	<script src="https://unpkg.com/split.js/dist/split.min.js"></script>
 	<script src="js/lib/moment.min.js"></script>
 	<script src="js/lib/jquery-2.1.4.min.js"></script>
 	<script src="js/lib/tooltipster.bundle.min.js"></script>
 	<script src="js/lib/jquery.tmpl.min.js"></script>
-	<script src="js/lib/jquery.splitter.js"></script>
 
 	<script src="js/bbdgg.js"></script>
 	<script src="js/util.js"></script>
@@ -99,9 +99,17 @@
 			</div>
 			<div id="vod-list"></div>
 		</div>
-		<div id="player" class="view">
+		<div id="player" class="view" style="flex-direction: row;">
 			<div id="video-player"></div>
 			<div id="chat-container">
+				<div id="chat-controls">
+					<div id="delay-controls">
+						<div id="dec-delay-button"><span class="octicon octicon-arrow-left"></span></div>
+						<div id="delay-container"><span id="delay">2</span> seconds</div>
+						<div id="inc-delay-button"><span class="octicon octicon-arrow-right"></span></div>
+					</div>
+					<div id="switch-sides-button"><span class="octicon octicon-sync"></span></div>
+				</div>
 				<div id="chat-stream"></div>
 			</div>
 		</div>

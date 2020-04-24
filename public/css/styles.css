@@ -48,7 +48,7 @@ body {
 	align-items: center;
 	color: white;
 	font-size: 20px;
-	margin-right: 100px;
+	margin-right: 10px;
 }
 
 #header-links div {
@@ -174,7 +174,7 @@ body {
 }
 
 #player {
-	display: none;
+	display: flex;
 	height: 100%;
 }
 
@@ -192,13 +192,11 @@ body {
 	width: 100%;
 }
 
-.vsplitter {
-	width: 10px;
-	cursor: col-resize;
+.split, .gutter.gutter-horizontal {
+    float: left;
 }
-
-.vsplitter:hover {
-	background-color: #888;
+.gutter.gutter-horizontal {
+    cursor: ew-resize;
 }
 
 #chat-container {
@@ -208,10 +206,45 @@ body {
 	width: 390px;
 }
 
+#chat-controls {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	height: -moz-calc(4%);
+	height: -webkit-calc(4%);
+	height: calc(4%);
+	font-size: 13px;
+	padding: 10px;
+	color: #EEEEEE;
+	background: #080808;
+}
+
+#delay-controls {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 30%;
+	height: -moz-calc(4%);
+	height: -webkit-calc(4%);
+	height: calc(4%);
+	font-size: 13px;
+	padding: 10px;
+	color: #EEEEEE;
+	background: #080808;
+}
+
+#delay-container {
+	text-align: center;
+}
+
+#dec-delay-button, #inc-delay-button, #switch-sides-button {
+	cursor: pointer;
+}
+
 #chat-stream {
-	height: -moz-calc(100%);
-	height: -webkit-calc(100%);
-	height: calc(100%);
+	height: -moz-calc(94%);
+	height: -webkit-calc(94%);
+	height: calc(94%);
 	font-size: 13px;
 	padding: 10px;
 	color: #EEEEEE;
@@ -299,16 +332,6 @@ body {
 
 .combo {
 	font-size: 14px;
-}
-
-/* Special Chat Colors */
-
-.user-Destiny {
-	color: #b91010 !important;
-}
-
-.user-Bot_v2_Beta, .user-Bot, .user-Logs {
-	color: #e79015 !important;
 }
 
 /* Scroll Bar Style */

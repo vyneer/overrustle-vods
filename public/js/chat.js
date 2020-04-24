@@ -3,17 +3,12 @@ var Chat = function(id, player) {
 	this.status = "loading";
 	this.skipView = false;
 	this.videoPlayer = player;
-	this.chatDelay = 2;
 	this.previousTimeOffset = -1;
 
 	this.previousMessage = '';
 	this.comboCount = 1;
 
 	var self = this;
-
-	// $.get('/users', function(data) {
-	//   self._parseUserData(JSON.parse(data));
-	// });
 
 	// sending a client-id header by default
 	$.ajaxSetup({headers: {"Client-ID" : "88bxd2ntyahw9s8ponrq2nwluxx17q"}});
@@ -87,7 +82,7 @@ var Chat = function(id, player) {
 
 	this._renderChatMessage = function(username, message, features) {
 		var usernameField = "";
-		var featuresField = ""
+		var featuresField = "";
 		if (features.slice(1,-1) != "") {
 			let flairArray = features.slice(1,-1).split(",");
 			let flairList = "";
@@ -104,12 +99,12 @@ var Chat = function(id, player) {
 			});
 			usernameField =  "<span class='user " + flairList + "'>" + username + "</span>: ";
 		}
-
+	
 		$("#chat-stream").append("<div class='chat-line'>" + 
 			featuresField +
 			usernameField + 
 			"<span class='message'>" +
-		  message + "</span></div>");		
+		  message + "</span></div>");
 	}
 
 	this._generateDestinyEmoteImage = function(emote) {
@@ -142,7 +137,7 @@ var Chat = function(id, player) {
 	window.setInterval(function() {
 		if (self.status == "running" && self.chat) {
 			var currentTimeOffset = Math.floor(self.videoPlayer.getCurrentTime());
-			var utcFormat = self.recordedTime.clone().add(self.chatDelay + currentTimeOffset, 's').format().replace("+00:00", "Z");
+			var utcFormat = self.recordedTime.clone().add(Number($("#delay").text()) + currentTimeOffset, 's').format().replace("+00:00", "Z");
 			
 			if (currentTimeOffset != self.previousTimeOffset && self.chat[utcFormat]) {
 				self.chat[utcFormat].forEach(function(chatLine) {
@@ -151,7 +146,7 @@ var Chat = function(id, player) {
 
 						$('#chat-stream .chat-line').last().remove();
 						var comboMessage = self._renderComboMessage(self.previousMessage, self.comboCount);
-						self._renderChatMessage(null, comboMessage, null);
+						self._renderChatMessage(null, comboMessage, "");
 					} else {
 						self.comboCount = 1;
 						self._renderChatMessage(chatLine.username, self._formatMessage(chatLine.message), chatLine.features);
