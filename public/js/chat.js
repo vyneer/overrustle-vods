@@ -22,7 +22,7 @@ var Chat = function(id, player) {
 		self.duration = moment.duration(self.durationString).asSeconds();
 		self.endTime = moment(self.recordedTime).add(self.duration, 'seconds').utc();
 			
-		$.get("https://vyneer.me/api/logs", {
+		$.get("/logs", {
 			from: moment(self.recordedTime).format(),
 			to: moment(self.endTime).format()
 		}, function(data) {
