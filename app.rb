@@ -13,7 +13,7 @@ end
 
 get '/logs' do
   url = "https://vyneer.me/api/logs?from=" + params["from"] + "&to=" + params["to"] + "&token=" + api_token
-  JSON.parse(open(url))
+  open(url)
 end
 
 get '/emotes' do

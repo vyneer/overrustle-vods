@@ -23,10 +23,10 @@ var Chat = function(id, player) {
 		self.endTime = moment(self.recordedTime).add(self.duration, 'seconds').utc();
 			
 		$.get("/logs", {
-			from: moment(self.recordedTime).format(),
-			to: moment(self.endTime).format()
+			from: moment(self.recordedTime).format().replace("+00:00", "Z"),
+			to: moment(self.endTime).format().replace("+00:00", "Z")
 		}, function(data) {
-			self.chat = data;
+			self.chat = JSON.parse(data);
 			self.startChatStream();
 		});
 	});
