@@ -22,9 +22,9 @@ var Chat = function(id, player) {
 		self.duration = moment.duration(self.durationString).asSeconds();
 		self.endTime = moment(self.recordedTime).add(self.duration, 'seconds').utc();
 			
-		$.get("/logs", {
-			from: moment(self.recordedTime).format().replace("+00:00", "Z"),
-			to: moment(self.endTime).format().replace("+00:00", "Z")
+		$.get("https://vyneer.me/api/logs", {
+			from: moment(self.recordedTime).format(),
+			to: moment(self.endTime).format()
 		}, function(data) {
 			self.chat = JSON.parse(data);
 			self.startChatStream();
