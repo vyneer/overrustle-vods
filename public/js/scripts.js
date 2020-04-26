@@ -150,14 +150,14 @@ var allVODs = [];
 
 async function loadVODs() {
     vodArray = [];
-    var destinyVODsURL = "https://api.twitch.tv/helix/videos/?user_id=" + destinyUserID + "&first=100&type=archive";
+    var destinyVODsURL = "/vodinfo?user_id=" + destinyUserID + "&first=100&type=archive";
     let response = await fetch(destinyVODsURL, { headers: { 'Client-ID': clientID}});
     let data = await response.json();
     pageCursor = data.pagination.cursor;
     vodArray.push(...data.data);
     // if there are more than 100 vods, check next page and add everything there to the array; repeat until done
     while (data.data.length === 100 && pageCursor != ("" || null)) {
-        destinyVODsURL = "https://api.twitch.tv/helix/videos/?user_id=" + destinyUserID + "&first=100&type=archive&after=" + pageCursor;
+        destinyVODsURL = "/vodinfo?user_id=" + destinyUserID + "&first=100&type=archive&after=" + pageCursor;
         response = await fetch(destinyVODsURL, { headers: { 'Client-ID': clientID}});
         data = await response.json();
         pageCursor = data.pagination.cursor;

@@ -13,7 +13,7 @@ var Chat = function(id, player) {
 	// sending a client-id header by default
 	$.ajaxSetup({headers: {"Client-ID" : "88bxd2ntyahw9s8ponrq2nwluxx17q"}});
 
-	$.get("https://api.twitch.tv/helix/videos?id=" + this.videoId, function(vodData) {
+	$.get("/vodinfo?id=" + this.videoId, function(vodData) {
 		self.hReplace = new RegExp('([h])', 'gm');
 		self.mReplace = new RegExp('([m])', 'gm');
 		self.sReplace = new RegExp('([s])', 'gm');
