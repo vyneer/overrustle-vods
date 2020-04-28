@@ -17,8 +17,9 @@ var Chat = function(id, player) {
 		self.hReplace = new RegExp('([h])', 'gm');
 		self.mReplace = new RegExp('([m])', 'gm');
 		self.sReplace = new RegExp('([s])', 'gm');
-		self.recordedTime = moment(vodData["data"][0]["created_at"]).utc();
-		self.durationString = "PT" + vodData["data"][0]["duration"].replace(self.hReplace, 'H').replace(self.mReplace, 'M').replace(self.sReplace, 'S');
+		data = JSON.parse(vodData)
+		self.recordedTime = moment(data["data"][0]["created_at"]).utc();
+		self.durationString = "PT" + data["data"][0]["duration"].replace(self.hReplace, 'H').replace(self.mReplace, 'M').replace(self.sReplace, 'S');
 		self.duration = moment.duration(self.durationString).asSeconds();
 		self.endTime = moment(self.recordedTime).add(self.duration, 'seconds').utc();
 			

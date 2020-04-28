@@ -210,9 +210,9 @@ body {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	height: -moz-calc(4%);
-	height: -webkit-calc(4%);
-	height: calc(4%);
+	height: -moz-calc(2%);
+	height: -webkit-calc(2%);
+	height: calc(2%);
 	font-size: 13px;
 	padding: 10px;
 	color: #EEEEEE;
@@ -224,9 +224,9 @@ body {
 	justify-content: space-between;
 	align-items: center;
 	width: 30%;
-	height: -moz-calc(4%);
-	height: -webkit-calc(4%);
-	height: calc(4%);
+	height: -moz-calc(2%);
+	height: -webkit-calc(2%);
+	height: calc(2%);
 	font-size: 13px;
 	padding: 10px;
 	color: #EEEEEE;
@@ -242,9 +242,9 @@ body {
 }
 
 #chat-stream {
-	height: -moz-calc(94%);
-	height: -webkit-calc(94%);
-	height: calc(94%);
+	height: -moz-calc(96%);
+	height: -webkit-calc(96%);
+	height: calc(96%);
 	font-size: 13px;
 	padding: 10px;
 	color: #EEEEEE;
