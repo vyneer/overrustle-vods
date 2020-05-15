@@ -30,6 +30,19 @@ get '/' do
   File.read(File.join('public', 'index.html'))
 end
 
+get '/userinfo' do
+  oauth_header = "OAuth " + twitch_token
+  expiry = validate_token(oauth_header)
+  if expiry == 0
+    twitch_token = get_token(token_url)
+  end
+  bearer_header = "Bearer " + twitch_token
+  if params['user_login']
+    response = open("https://api.twitch.tv/helix/streams?user_login=" + params['user_login'], "Authorization" => bearer_header, "Client-ID" => ENV['TWITCH_CLIENT_ID'])
+  end
+  response
+end
+
 get '/vodinfo' do
   oauth_header = "OAuth " + twitch_token
   expiry = validate_token(oauth_header)

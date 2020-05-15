@@ -9,10 +9,6 @@ var Chat = function(id, player) {
 	this.comboCount = 1;
 
 	var self = this;
-
-	// sending a client-id header by default
-	$.ajaxSetup({headers: {"Client-ID" : "88bxd2ntyahw9s8ponrq2nwluxx17q"}});
-
 	$.get("/vodinfo?id=" + this.videoId, function(vodData) {
 		self.hReplace = new RegExp('([h])', 'gm');
 		self.mReplace = new RegExp('([m])', 'gm');

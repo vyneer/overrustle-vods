@@ -62,7 +62,7 @@
 		function vodURL(url) {
 			regex = new RegExp('(?=[0-9])[^\/]+', 'gm');
 			replaced = url.match(regex);
-			window.location.href += "?id=" + replaced[0].replace(/[?]/gm, '&');
+			window.location.href = window.location.origin + "?id=" + replaced[0].replace(/[?]/gm, '&');
 		};
 	</script>
 
