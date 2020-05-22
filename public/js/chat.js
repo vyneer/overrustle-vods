@@ -55,9 +55,9 @@ var Chat = function(id, player, type) {
 
 		loadingEmote = " <div class='emote " + randomEmote + "' title=" + randomEmote + "/>"
 
-		$("#chat-stream").append("<div id='loading-message' class='chat-line'><span class='username loading-message'>Loading!</span> <span class='message'>Please wait " + loadingEmote + "</span></div>");
-		$("#chat-stream").append("<div id='loading-message-2' class='chat-line'><span class='message'>Please wait " + loadingEmote + "</span></div>");
-		$("#chat-stream").append("<div id='loading-message-3' class='chat-line'><span class='message'>" + randomMessage + "</span></div>");
+		$("#chat-stream").append("<div id='loading-message'><div id='loading-message-1' class='chat-line'><span class='username loading-message'>Loading logs!</span></div>"
+		+ "<div id='loading-message-2' class='chat-line'><span class='message'>Please wait " + loadingEmote + "</span></div>"
+		+ "<div id='loading-message-3' class='chat-line'><span class='message'>" + randomMessage + "</span></div>" + "</div>");
 
 		$.get("https://vyneer.me/api/logs", {
 			from: moment(self.recordedTime).format().replace("+00:00", "Z"),
@@ -65,9 +65,7 @@ var Chat = function(id, player, type) {
 		}, function(data) {
 			self.chat = data;
 			self.startChatStream();
-			$("#loading-message-1").remove();
-			$("#loading-message-2").remove();
-			$("#loading-message-3").remove();
+			$("#loading-message").remove();
 		});
 	});
 
