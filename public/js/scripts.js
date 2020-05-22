@@ -5,6 +5,7 @@ $(document).ready(function() {
     var v = getUrlParameter("v")
     var time = getUrlParameter("t");
     var page = 1;
+    var playerActive = 0;
     globals.sizes = localStorage.getItem('split-sizes');
 
     if (globals.sizes) {
@@ -17,19 +18,26 @@ $(document).ready(function() {
         loadPlayer(id, time, "twitch");
         $("#browse").hide();
         $("#player").show();
+        $("#changelog").hide();
+        playerActive = 1;
     } else if (id && !time) {
         loadPlayer(id, 0, "twitch");
         $("#browse").hide();
         $("#player").show();
-        loadPlayer(id);
+        $("#changelog").hide();
+        playerActive = 1;
     } else if (v && time) {
         loadPlayer(v, time, "youtube");
         $("#browse").hide();
         $("#player").show();
+        $("#changelog").hide();
+        playerActive = 1;
     } else if (v && !time) {
         loadPlayer(v, 0, "youtube");
         $("#browse").hide();
         $("#player").show();
+        $("#changelog").hide();
+        playerActive = 1;
     } else {
         // preloading all vods since twitch api pagination is inconsistent and bad >:(
         loadVODs().then(result => {
@@ -51,6 +59,23 @@ $(document).ready(function() {
         cursor: 'col-resize',
         onDragEnd: function(sizes) {
             localStorage.setItem('split-sizes', JSON.stringify(sizes));
+        }
+    });
+
+    $("#changelog-button").click(function() {
+        $("#changelog").show();
+        $("#player").hide();
+        $("#browse").hide();
+    });
+
+    $("#close-changelog-button").click(function() {
+        $("#changelog").hide();
+        if (playerActive === 1) {
+            $("#player").show();
+            $("#browse").hide();
+        } else {
+            $("#player").hide();
+            $("#browse").show();
         }
     });
 
