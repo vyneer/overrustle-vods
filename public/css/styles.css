@@ -351,6 +351,12 @@ body {
 	font-size: 14px;
 }
 
+/* Special Chat Colors */
+
+.loading-message {
+	color: #b002c7 !important;	
+}
+
 /* Scroll Bar Style */
 
 ::-webkit-scrollbar-track

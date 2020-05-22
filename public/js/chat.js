@@ -9,6 +9,12 @@ var Chat = function(id, player, type) {
 	this.previousMessage = '';
 	this.comboCount = 1;
 
+	const cuteEmotes = ['Aslan', 'AYAYA', 'Blubstiny', 'Cutestiny', 'DestiSenpaii', 'FeelsOkayMan', 
+	'FerretLOL', 'FrankerZ', 'Hhhehhehe', 'NOBULLY', 'OhMyDog', 'PepoTurkey',
+	'POTATO', 'Slugstiny', 'SoDoge', 'TeddyPepe', 'widepeepoHappy', 'WOOF',
+	'Wowee', 'YEE', 'YEEHAW', 'ComfyAYA', 'ComfyFerret', 'MiyanoHype',
+	'PepoComfy', 'ComfyDog', 'nathanAYAYA', 'nathanWeeb'];
+
 	var self = this;
 
 	if (this.playerType === "twitch") {
@@ -33,12 +39,21 @@ var Chat = function(id, player, type) {
 			self.endTime = moment(data["items"][0]["liveStreamingDetails"]["actualEndTime"]).utc();
 			self.difference = self.endTime.clone().startOf('day').diff(self.recordedTime.clone().startOf('day'), 'days');
 		}
+
+		var randomEmote = cuteEmotes[Math.floor(Math.random() * cuteEmotes.length)];
+
+		loadingEmote = " <div class='emote " + randomEmote + "' title=" + randomEmote + "/>"
+
+		$("#chat-stream").append("<div id='loading-message' class='chat-line'><span class='username loading-message'>Loading!</span> <span class='message'>Please wait " + loadingEmote + "</span></div>");
+
+
 		$.get("https://vyneer.me/api/logs", {
 			from: moment(self.recordedTime).format().replace("+00:00", "Z"),
 			to: moment(self.endTime).format().replace("+00:00", "Z")
 		}, function(data) {
 			self.chat = data;
 			self.startChatStream();
+			$("#loading-message").remove();
 		});
 	});
 
