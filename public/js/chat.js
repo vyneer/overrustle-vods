@@ -200,7 +200,7 @@ var Chat = function(id, player, type) {
 
 			self.previousTimeOffset = currentTimeOffset;
 		}
-	}, 1000);
+	}, 500);
 };
 
 // From https://stackoverflow.com/a/3890175
