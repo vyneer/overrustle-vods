@@ -28,9 +28,11 @@ var Chat = function(id, player, type) {
 
 	var self = this;
 
-	// $.get('/users', function(data) {
-	//   self._parseUserData(JSON.parse(data));
-	// });
+	if (this.playerType === "twitch") {
+		infoUrl = "/vodinfo?id="
+	} else if (this.playerType === "youtube") {
+		infoUrl = "/vidinfo?id="
+	}
 
 	if (this.playerType === "twitch") {
 		infoUrl = "/vodinfo?id="
@@ -54,25 +56,6 @@ var Chat = function(id, player, type) {
 			self.endTime = moment(data["items"][0]["liveStreamingDetails"]["actualEndTime"]).utc();
 			self.difference = self.endTime.clone().startOf('day').diff(self.recordedTime.clone().startOf('day'), 'days');
 		}
-		
-		var overrustleLogsDates = [];
-
-		for (let i = 0; i <= self.difference; i++) {
-			if (self.recordedTime.format("MM") === self.recordedTime.clone().add(i, 'days').format("MM")) {
-				var overrustleLogsStr = "https://dgg.overrustlelogs.net/Destinygg%20chatlog/" + 
-					self.recordedTime.format("MMMM") + "%20" + 
-					self.recordedTime.format("YYYY") + "/" + 
-					self.recordedTime.format("YYYY") + "-" +
-					self.recordedTime.format("MM") + "-" + self.recordedTime.clone().add(i, 'days').format("DD") + ".txt";
-			} else {
-				var overrustleLogsStr = "https://dgg.overrustlelogs.net/Destinygg%20chatlog/" + 
-					self.recordedTime.clone().add(i, 'days').format("MMMM") + "%20" + 
-					self.recordedTime.clone().add(i, 'days').format("YYYY") + "/" + 
-					self.recordedTime.clone().add(i, 'days').format("YYYY") + "-" +
-					self.recordedTime.clone().add(i, 'days').format("MM") + "-" + self.recordedTime.clone().add(i, 'days').format("DD") + ".txt";
-			}
-			overrustleLogsDates.push(overrustleLogsStr);
-		}
 
 		var randomEmote = cuteEmotes[Math.floor(Math.random() * cuteEmotes.length)];
 		var randomMessage = memeMessages[Math.floor(Math.random() * memeMessages.length)];
@@ -83,12 +66,11 @@ var Chat = function(id, player, type) {
 		+ "<div id='loading-message-2' class='chat-line'><span class='message'>Please wait " + loadingEmote + "</span></div>"
 		+ "<div id='loading-message-3' class='chat-line'><span class='message'>" + randomMessage + "</span></div>" + "</div>");
 
-		$.get("/chat", {
-			urls: JSON.stringify(overrustleLogsDates),
-			from: self.recordedTime.clone().format("YYYY-MM-DD HH:mm:ss UTC"),
-			to: self.endTime.clone().format("YYYY-MM-DD HH:mm:ss UTC")
+		$.get("https://vyneer.me/api/logs", {
+			from: moment(self.recordedTime).format().replace("+00:00", "Z"),
+			to: moment(self.endTime).format().replace("+00:00", "Z")
 		}, function(data) {
-			self.chat = JSON.parse(data);
+			self.chat = data;
 			self.startChatStream();
 			$("#loading-message").remove();
 		});
@@ -151,20 +133,34 @@ var Chat = function(id, player, type) {
 			"<span class='combo'>C-C-C-COMBO</span>";
 	}
 
-	this._renderChatMessage = function(time, username, message) {
+	this._renderChatMessage = function(time, username, message, features) {
 		var usernameField = "";
+		var featuresField = "";
 		var timeFormatted = "";
 		if (time) {
 			timeFormatted = "<span class='time'>" + moment(time).utc().format("HH:mm") + " </span>";
 		}
-		if (username) {
-			usernameField = `<span onclick='document._addFocusRule("${username}")' class='username user-${username}'>${username}</span>: `;
+		if (features.slice(1,-1) != "") {
+			let flairArray = features.slice(1,-1).split(",");
+			let flairList = "";
+			flairArray.forEach(function(flair) {
+				flairList += "<i class='flair " + flair + "'></i>";
+			});
+			featuresField =  "<span class='features'>" + flairList + "</span>";
 		}
-
+		if (username) {
+			let flairArray = features.slice(1,-1).split(",");
+			let flairList = ""
+			flairArray.forEach(function(flair) {
+				flairList += flair + " "
+			});
+			usernameField = `<span onclick='document._addFocusRule("${username}")' class='user-${username} user ${flairList}'>${username}</span>: `;
+		}
+	
 		$("#chat-stream").append("<div class='chat-line' data-username='" + username + "'>" + 
-			timeFormatted + usernameField + 
+			timeFormatted + featuresField + usernameField + 
 			"<span class='message' onclick='document._removeFocusRule()'>" +
-		  message + "</span></div>");		
+		  message + "</span></div>");
 	}
 
 	this._generateDestinyEmoteImage = function(emote) {
@@ -236,10 +232,10 @@ var Chat = function(id, player, type) {
 							self.comboCount++;
 							$('#chat-stream .chat-line').last().remove();
 							var comboMessage = self._renderComboMessage(self.previousMessage, self.comboCount);
-							self._renderChatMessage(null, null, comboMessage);
+							self._renderChatMessage(null, null, comboMessage, "");
 						} else {
 							self.comboCount = 1;
-							self._renderChatMessage(element, chatLine.username, self._formatMessage(chatLine.message));
+							self._renderChatMessage(element, chatLine.username, self._formatMessage(chatLine.message), chatLine.features);
 						}
 	
 						self.previousMessage = chatLine.message;

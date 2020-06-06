@@ -329,11 +329,26 @@ body {
     padding-right: .3em;
 }
 
-.chat-line .username {
+.chat-line .user {
 	font-weight: bold;
 	cursor: pointer;
 	vertical-align: middle;
 	color: #CACACA;
+}
+
+.chat-line .features {
+	display: -webkit-inline-box;
+	display: inline-flex;
+	vertical-align: text-top;
+	-webkit-box-align: center;
+	align-items: center;
+	margin-left: -.2em;
+	margin-right: .2em
+}
+
+.chat-line .features .flair {
+	margin-left: .2em;
+	margin-right: .2em
 }
 
 .chat-line .message {
@@ -412,22 +427,6 @@ body {
 
 .loading-message {
 	color: #b002c7 !important;	
-}
-
-.user-Destiny {
-	color: #EE1F1F !important;
-}
-
-.user-Bot, .user-Logs {
-	color: #0088CC !important;
-}
-
-.user-RightToBearArmsLOL, .user-Cake, .user-CeneZa, .user-LinusRed {
-	color: #DB4C1C !important;
-}
-
-.user-Dan, .user-MrMouton, .user-RNA, .user-RenegadeZero, .user-LilyPichu, .user-ErisAnn {
-	color: #E79015 !important;
 }
 
 .chat-line[data-username="Broadcast"], .chat-line[data-username="Subscriber"], .chat-line[data-username="SubscriberMessage"] {
