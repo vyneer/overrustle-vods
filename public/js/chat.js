@@ -6,26 +6,33 @@ var Chat = function(id, player, type) {
 	this.previousTimeOffset = -1;
 	this.playerType = type;
 
+	this.actualPreviousTimeOffset = -1;
 	this.previousMessage = '';
 	this.comboCount = 1;
 
-	const cuteEmotes = ['Aslan', 'AYAYA', 'Blubstiny', 'Cutestiny', 'DestiSenpaii', 'FeelsOkayMan', 
+	const cuteEmotes = ['ASLAN', 'AYAYA', 'Blubstiny', 'Cutestiny', 'DestiSenpaii', 'FeelsOkayMan', 
 	'FerretLOL', 'FrankerZ', 'Hhhehhehe', 'NOBULLY', 'OhMyDog', 'PepoTurkey',
 	'POTATO', 'Slugstiny', 'SoDoge', 'TeddyPepe', 'widepeepoHappy', 'WOOF',
 	'Wowee', 'YEE', 'YEEHAW', 'ComfyAYA', 'ComfyFerret', 'MiyanoHype',
 	'PepoComfy', 'ComfyDog', 'nathanAYAYA', 'nathanWeeb'];
 
 	const memeMessages = ["<div class='emote YEE' title=YEE></div> neva lie, <div class='emote YEE' title=YEE></div> neva, <div class='emote YEE' title=YEE></div> neva lie.",
-	"Don't believe his lies.", "You could've played that better.", "Dishonorable PVP <div class='emote OverRustle' title=OverRustle></div>", 
-	"how do not have any cups in your apartment wtf",
-	"destiny before you have sex are you supposed to have a boner before the girl sees it?", 
-	"Well RightToBearArmsLOL, honestly, I think I might talk to Steven about your odd rhetoric.",
-	"BAR BAR BAR", "he handles my", "nukesys", "Did I shield in Lords Mobile?", "THE TIME FOR CHILLING HAS PASSED",
-	"OK HERES THE PLAN", "NO TEARS NOW, ONLY DREAMS", "How did I end up cleaning carpets? <div class='emote LeRuse' title=LeRuse></div>",
-	"B O D G A Y", "JIMMY NOOOO", "<div class='emote nathanTiny2' title=nathanTiny2></div>", ">more like", "Chat, don't woof."];
-
+						"Don't believe his lies.", "You could've played that better.", "Dishonorable PVP <div class='emote OverRustle' title=OverRustle></div>", 
+						"how do not have any cups in your apartment wtf",
+						"destiny before you have sex are you supposed to have a boner before the girl sees it?", 
+						"Well RightToBearArmsLOL, honestly, I think I might talk to Steven about your odd rhetoric.",
+						"BAR BAR BAR", "he handles my", "nukesys", "Did I shield in Lords Mobile?", "THE TIME FOR CHILLING HAS PASSED",
+						"OK HERES THE PLAN", "NO TEARS NOW, ONLY DREAMS", "How did I end up cleaning carpets? <div class='emote LeRuse' title=LeRuse></div>",
+						"B O D G A Y", "JIMMY NOOOO", "<div class='emote nathanTiny2' title=nathanTiny2></div>", ">more like", "Chat, don't woof.",
+						"Yeah, fuck off buddy we absolutely need more RNA duos.", "kids fuckin dirt nasty man", "Fuckin every time this kid steps in the battleground someone dies."];
 
 	var self = this;
+
+	if (this.playerType === "twitch") {
+		infoUrl = "/vodinfo?id="
+	} else if (this.playerType === "youtube") {
+		infoUrl = "/vidinfo?id="
+	}
 
 	if (this.playerType === "twitch") {
 		infoUrl = "/vodinfo?id="
@@ -100,8 +107,16 @@ var Chat = function(id, player, type) {
 		$("head").append(styleString);
 	};
 
+	this._htmlEncode = function(s) {
+		return $('<div>').text(s).html();
+	};
+
+	this._htmlDecode = function(s) {
+		return $('<div>').html(s).text();
+	};
+
 	this._formatMessage = function(message) {
-		var messageReplaced = message.linkify();
+		var messageReplaced = this._htmlDecode(message).linkify();
 
 		function replacer(p1) {
 			return self._generateDestinyEmoteImage(p1.replace(/ /g,''));
@@ -118,9 +133,13 @@ var Chat = function(id, player, type) {
 			"<span class='combo'>C-C-C-COMBO</span>";
 	}
 
-	this._renderChatMessage = function(username, message, features) {
+	this._renderChatMessage = function(time, username, message, features) {
 		var usernameField = "";
 		var featuresField = "";
+		var timeFormatted = "";
+		if (time) {
+			timeFormatted = "<span class='time'>" + moment(time).utc().format("HH:mm") + " </span>";
+		}
 		if (features.slice(1,-1) != "") {
 			let flairArray = features.slice(1,-1).split(",");
 			let flairList = "";
@@ -135,13 +154,12 @@ var Chat = function(id, player, type) {
 			flairArray.forEach(function(flair) {
 				flairList += flair + " "
 			});
-			usernameField =  "<span class='user " + flairList + "'>" + username + "</span>: ";
+			usernameField = `<span onclick='document._addFocusRule("${username}")' class='user-${username} user ${flairList}'>${username}</span>: `;
 		}
 	
-		$("#chat-stream").append("<div class='chat-line'>" + 
-			featuresField +
-			usernameField + 
-			"<span class='message'>" +
+		$("#chat-stream").append("<div class='chat-line' data-username='" + username + "'>" + 
+			timeFormatted + featuresField + usernameField + 
+			"<span class='message' onclick='document._removeFocusRule()'>" +
 		  message + "</span></div>");
 	}
 
@@ -150,7 +168,7 @@ var Chat = function(id, player, type) {
 	};
 
 	this._greenTextify = function(message) {
-		if (message[0] === '>') {
+		if (this._htmlDecode(message)[0] === '>') {
 			return "<span class='greentext'>" + message + "</span>";
 		} else {
 			return message;
@@ -172,33 +190,75 @@ var Chat = function(id, player, type) {
 					 this._formatTimeNumber(seconds);
 	}
 
+	if (self.playerType == "twitch") {
+		self.videoPlayer.addEventListener(Twitch.Player.PLAYING, function() {
+			self.actualPreviousTimeOffset = Math.floor(self.videoPlayer.getCurrentTime());
+		});
+	} else {
+		self.videoPlayer.addEventListener('onStateChange', function(event) {
+			if (event.data == YT.PlayerState.PLAYING) {
+				self.actualPreviousTimeOffset = Math.floor(self.videoPlayer.getCurrentTime());
+			}
+		});
+	}
+
 	window.setInterval(function() {
 		if (self.status == "running" && self.chat) {
 			var currentTimeOffset = Math.floor(self.videoPlayer.getCurrentTime());
-			var utcFormat = self.recordedTime.clone().add(Number($("#delay").text()) + currentTimeOffset, 's').format().replace("+00:00", "Z");
-			
-			if (currentTimeOffset != self.previousTimeOffset && self.chat[utcFormat]) {
-				self.chat[utcFormat].forEach(function(chatLine) {
-					if (self.previousMessage == chatLine.message && self.emoteList[self.previousMessage]) {
-						self.comboCount++;
+			var utcFormat = [];
+			var timestamps = [];
 
-						$('#chat-stream .chat-line').last().remove();
-						var comboMessage = self._renderComboMessage(self.previousMessage, self.comboCount);
-						self._renderChatMessage(null, comboMessage, "");
-					} else {
-						self.comboCount = 1;
-						self._renderChatMessage(chatLine.username, self._formatMessage(chatLine.message), chatLine.features);
+			if (currentTimeOffset != self.previousTimeOffset) {
+
+				timeDifference = currentTimeOffset - self.actualPreviousTimeOffset;
+				
+				timestamps.push(self.recordedTime.clone().add(Number($("#delay").text()) + currentTimeOffset, 's').format().replace("+00:00", "Z"));
+
+				if (timeDifference > 1 && timeDifference < 30) {
+					for (let i = 1; i < timeDifference; i++) {
+						timestamps.push(timestamp = self.recordedTime.clone().add(Number($("#delay").text()) + currentTimeOffset - i, 's').format().replace("+00:00", "Z"));
+					};
+				}
+
+				timestamps.forEach((element) => {
+					if (element in self.chat) {
+						utcFormat.unshift(element);
 					}
-
-					self.previousMessage = chatLine.message;
 				});
 
-				$("#chat-stream").animate({ 
-					scrollTop: $("#chat-stream").prop("scrollHeight")
-				}, 0);
+				utcFormat.forEach((element) => {
+					self.chat[element].forEach(function(chatLine) {
+						if (self.previousMessage == chatLine.message && self.emoteList[self.previousMessage]) {
+							self.comboCount++;
+							$('#chat-stream .chat-line').last().remove();
+							var comboMessage = self._renderComboMessage(self.previousMessage, self.comboCount);
+							self._renderChatMessage(null, null, comboMessage, "");
+						} else {
+							self.comboCount = 1;
+							self._renderChatMessage(element, chatLine.username, self._formatMessage(chatLine.message), chatLine.features);
+						}
+	
+						self.previousMessage = chatLine.message;
+
+						$("#chat-stream").animate({
+							scrollTop: $("#chat-stream").prop("scrollHeight")
+						}, 0);
+					});
+				});
+
+				self.actualPreviousTimeOffset = currentTimeOffset;
+
+				if ($("#lineLimit").val() != "0" || $("#lineLimit").val() != "") {
+					if ($("#chat-stream").children().length > $("#lineLimit").val()) {
+						removeLine = "#chat-stream div:lt(" + ($("#chat-stream").children().length - $("#lineLimit").val()) + ")";
+						$(removeLine).remove();
+					}
+				}
+
 			}
 
 			self.previousTimeOffset = currentTimeOffset;
+
 		}
 	}, 500);
 };
