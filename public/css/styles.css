@@ -433,7 +433,7 @@ body {
     color: transparent !important;
 }
 
-.chat-line[data-username="Broadcast"] .username, .chat-line[data-username="Subscriber"] .username, .chat-line[data-username="SubscriberMessage"] .username {
+.chat-line[data-username="Broadcast"] .user, .chat-line[data-username="Subscriber"] .user, .chat-line[data-username="SubscriberMessage"] .chat-line[data-username="SubscriberMessage"] {
     display: none !important;
 }
 
