@@ -4,7 +4,6 @@ require 'sinatra'
 require 'json'
 require 'open-uri'
 
-emotes = open('https://cdn.destiny.gg/emotes/emotes.json')
 token_url = "https://id.twitch.tv/oauth2/token?client_id=" + ENV['TWITCH_CLIENT_ID'] + "&client_secret=" + ENV['TWITCH_CLIENT_SECRET'] + "&grant_type=client_credentials"
 
 def get_token(token_url)
@@ -70,5 +69,6 @@ get '/vodinfo' do
 end
 
 get '/emotes' do
+  emotes = open('https://cdn.destiny.gg/emotes/emotes.json')
   emotes
 end
