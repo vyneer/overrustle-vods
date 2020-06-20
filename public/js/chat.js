@@ -66,7 +66,7 @@ var Chat = function(id, player, type) {
 		+ "<div id='loading-message-2' class='chat-line'><span class='message'>Please wait " + loadingEmote + "</span></div>"
 		+ "<div id='loading-message-3' class='chat-line'><span class='message'>" + randomMessage + "</span></div>" + "</div>");
 
-		$.get("https://vyneer.me/api/logs", {
+		$.get("https://vyneer.me/tools/logs", {
 			from: moment(self.recordedTime).format().replace("+00:00", "Z"),
 			to: moment(self.endTime).format().replace("+00:00", "Z")
 		}, function(data) {
