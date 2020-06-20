@@ -13,6 +13,16 @@ var months = [
     "Dec"
 ];
 
+var logProviders = {
+    "OverRustleLogs" : "/chat",
+    "vyneer.me" : "https://vyneer.me/tools/logs"
+}
+
+var services = {
+    "twitch" : "/vodinfo?id=",
+    "youtube" : "/vidinfo?id="
+}
+
 // From http://stackoverflow.com/a/21903119
 var getUrlParameter = function(sParam) {
     var sPageURL = decodeURIComponent(window.location.search.substring(1)),

@@ -1,4 +1,4 @@
-var Chat = function(id, player, type, start, end) {
+var Chat = function(id, player, type, start, end, provider) {
 	this.videoId = id;
 	this.status = "loading";
 	this.skipView = false;
@@ -7,6 +7,7 @@ var Chat = function(id, player, type, start, end) {
 	this.playerType = type;
 	this.timestampStart = start;
 	this.timestampEnd = end;
+	this.logsProvider = provider;
 
 	this.chatStream = $("#chat-stream");
 	this.lastLine = $("#chat-stream .chat-line");
@@ -35,19 +36,7 @@ var Chat = function(id, player, type, start, end) {
 
 	var self = this;
 
-	if (this.playerType === "twitch") {
-		infoUrl = "/vodinfo?id="
-	} else if (this.playerType === "youtube") {
-		infoUrl = "/vidinfo?id="
-	}
-
-	if (this.playerType === "twitch") {
-		infoUrl = "/vodinfo?id="
-	} else if (this.playerType === "youtube") {
-		infoUrl = "/vidinfo?id="
-	}
-
-	$.get(infoUrl + this.videoId, function(vodData) {
+	$.get(services[self.playerType] + self.videoId, function(vodData) {
 		self.hReplace = new RegExp('([h])', 'gm');
 		self.mReplace = new RegExp('([m])', 'gm');
 		self.sReplace = new RegExp('([s])', 'gm');
@@ -69,6 +58,27 @@ var Chat = function(id, player, type, start, end) {
 
 		self.difference = self.endTime.clone().startOf('day').diff(self.recordedTime.clone().startOf('day'), 'days');
 
+		var overrustleLogsDates = [];
+
+		if (self.logsProvider === "OverRustleLogs") {
+			for (let i = 0; i <= self.difference; i++) {
+				if (self.recordedTime.format("MM") === self.recordedTime.clone().add(i, 'days').format("MM")) {
+					var overrustleLogsStr = "https://dgg.overrustlelogs.net/Destinygg%20chatlog/" + 
+						self.recordedTime.format("MMMM") + "%20" + 
+						self.recordedTime.format("YYYY") + "/" + 
+						self.recordedTime.format("YYYY") + "-" +
+						self.recordedTime.format("MM") + "-" + self.recordedTime.clone().add(i, 'days').format("DD") + ".txt";
+				} else {
+					var overrustleLogsStr = "https://dgg.overrustlelogs.net/Destinygg%20chatlog/" + 
+						self.recordedTime.clone().add(i, 'days').format("MMMM") + "%20" + 
+						self.recordedTime.clone().add(i, 'days').format("YYYY") + "/" + 
+						self.recordedTime.clone().add(i, 'days').format("YYYY") + "-" +
+						self.recordedTime.clone().add(i, 'days').format("MM") + "-" + self.recordedTime.clone().add(i, 'days').format("DD") + ".txt";
+				}
+				overrustleLogsDates.push(overrustleLogsStr);
+			}
+		}
+
 		var randomEmote = cuteEmotes[Math.floor(Math.random() * cuteEmotes.length)];
 		var randomMessage = memeMessages[Math.floor(Math.random() * memeMessages.length)];
 
@@ -78,11 +88,12 @@ var Chat = function(id, player, type, start, end) {
 		+ "<div id='loading-message-2' class='chat-line'><span class='message'>Please wait " + loadingEmote + "</span></div>"
 		+ "<div id='loading-message-3' class='chat-line'><span class='message'>" + randomMessage + "</span></div>" + "</div>");
 
-		$.get("https://vyneer.me/tools/logs", {
+		$.get(logProviders[self.logsProvider], {
+			urls: JSON.stringify(overrustleLogsDates),
 			from: moment(self.recordedTime).format().replace("+00:00", "Z"),
 			to: moment(self.endTime).format().replace("+00:00", "Z")
 		}, function(data) {
-			self.chat = data;
+			self.chat = (self.logsProvider === "OverRustleLogs") ? JSON.parse(data) : data;
 			self.startChatStream();
 			$("#loading-message").remove();
 		});
@@ -149,10 +160,12 @@ var Chat = function(id, player, type, start, end) {
 		var usernameField = "";
 		var featuresField = "";
 		var timeFormatted = "";
+		var flairList = "";
+		var featuresInMsg = (features) ? true : false;
 		if (time) {
 			timeFormatted = "<span class='time'>" + moment(time).utc().format("HH:mm") + " </span>";
 		}
-		if (features.slice(1,-1) != "") {
+		if (featuresInMsg && features.slice(1,-1) != "") {
 			let flairArray = features.slice(1,-1).split(",");
 			let flairList = "";
 			flairArray.forEach(function(flair) {
@@ -161,11 +174,12 @@ var Chat = function(id, player, type, start, end) {
 			featuresField =  "<span class='features'>" + flairList + "</span>";
 		}
 		if (username) {
-			let flairArray = features.slice(1,-1).split(",");
-			let flairList = ""
-			flairArray.forEach(function(flair) {
-				flairList += flair + " "
-			});
+			if (featuresInMsg) {
+				let flairArray = features.slice(1,-1).split(",");
+				flairArray.forEach(function(flair) {
+					flairList += flair + " "
+				});
+			}
 			usernameField = `<span onclick='document._addFocusRule("${username}")' class='user-${username} user ${flairList}'>${username}</span>: `;
 		}
 	

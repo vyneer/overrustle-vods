@@ -96,6 +96,13 @@
 				$("#showTime").prop('checked', false);
 			}
 			updateShowTime();
+
+			if (localStorage.getItem('logsProvider')) {
+				$(`#selectProvider option:contains("${localStorage.getItem('logsProvider')}")`).prop('selected', true);
+			} else {
+				$(`#selectProvider option:contains("OverRustleLogs")`).prop('selected', true);
+				localStorage.setItem('logsProvider', $("#selectProvider").val());
+			}
 		});
 
 		// stolen from https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_js_dropdown
@@ -133,6 +140,11 @@
 				document.getElementById("timeStyle").sheet.deleteRule(0);
 			}
 		}
+
+		function updateLogsProvider() {
+			localStorage.setItem('logsProvider', $("#selectProvider").val());
+			document.location.reload();
+		}
 	</script>
 
 	<div id="header" class="shadow">
@@ -154,6 +166,11 @@
 		<div id="changelog" class="view">
 			<div id="close-changelog-button"><span class="octicon octicon-x"></span></div>
 			<div id="changelog-text">
+				2020-06-20: <br>
+				1. custom start and end timestamps <br>
+				2. select from different log providers <br>
+				3. delay is now in a textbox <br>
+				4. negative delay <br>
 				2020-06-06: <br>
 				1. now checking for start and end timestamps of a vod before parsing logs (logs for short vods should load A LOT faster) <br>
 				2020-06-02: <br>
@@ -193,9 +210,16 @@
 						<div class="settings-dropdown">
 							<div id="settings-button" class="settings-button" onclick="showSettings()"><span class="octicon octicon-settings"></span></div>
 							<div id="settings-content" class="class-settings-content">
-								<label id="lineLimit-text" for="lineLimit">Max. lines in chat (0 for unlim.):</label>
+								<label class="settings-text" for="selectProvider">Select logs provider:</label>
+								<select id="selectProvider" onchange="updateLogsProvider()">
+									<option>OverRustleLogs</option>
+									<option>vyneer.me</option>
+								</select>
+								<br>
+								<label class="settings-text" for="lineLimit">Max. lines in chat (0 for unlim.):</label>
 								<input type="text" id="lineLimit" name="lineLimit" oninput="updateLineLimit()">
-								<label id="showTime-text" for="showTime">Show time:</label>
+								<br>
+								<label class="settings-text" for="showTime">Show time:</label>
 								<input type="checkbox" id="showTime" name="showTime" onclick="updateShowTime()">
 							</div>
 						</div>

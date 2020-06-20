@@ -286,7 +286,11 @@ body {
 	max-width: 150px;
 }
 
-#lineLimit-text, #showTime-text {
+#delay {
+	width: 28px;
+}
+
+.settings-text {
 	font-size: 16px;
 }
 

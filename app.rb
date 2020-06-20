@@ -4,6 +4,8 @@ require 'sinatra'
 require 'json'
 require 'open-uri'
 
+require File.expand_path('../lib/overrustle-vods.rb', __FILE__)
+
 token_url = "https://id.twitch.tv/oauth2/token?client_id=" + ENV['TWITCH_CLIENT_ID'] + "&client_secret=" + ENV['TWITCH_CLIENT_SECRET'] + "&grant_type=client_credentials"
 
 def get_token(token_url)
@@ -27,6 +29,11 @@ twitch_token = get_token(token_url)
 
 get '/' do
   File.read(File.join('public', 'index.html'))
+end
+
+get '/chat' do
+  overRustleLogsParser = OverRustleLogsParser.new(JSON.parse(params["urls"]), params["from"], params["to"])
+  overRustleLogsParser.get_chat.to_json
 end
 
 get '/vidinfo' do
