@@ -26,20 +26,23 @@ class OverRustleLogsParser
         timestamps.append(page[1, 23])
       end
 
-      # if there's no chatline at the initial timestamp, look for the closest one
-      while start_pos.nil?
-        start_pos = timestamps.index(from_stamp)
-        from_stamp = (Time.parse(from_stamp) - 1).strftime("%Y-%m-%d %H:%M:%S UTC")
-      end
+      # check if we even have actual timestamps and not just random strings
+      if timestamps[0][11..18] =~ /^([01]?[0-9]|2[0-3])\:[0-5][0-9]\:[0-5][0-9]$/
+        # if there's no chatline at the initial timestamp, look for the closest one
+        while start_pos.nil?
+          start_pos = timestamps.index(from_stamp)
+          from_stamp = (Time.parse(from_stamp) - 1).strftime("%Y-%m-%d %H:%M:%S UTC")
+        end
 
-      # same here for the last chatline
-      while end_pos.nil?
-        end_pos = timestamps.rindex(to_stamp)
-        to_stamp = (Time.parse(to_stamp) + 1).strftime("%Y-%m-%d %H:%M:%S UTC")
-      end
+        # same here for the last chatline
+        while end_pos.nil?
+          end_pos = timestamps.rindex(to_stamp)
+          to_stamp = (Time.parse(to_stamp) + 1).strftime("%Y-%m-%d %H:%M:%S UTC")
+        end
 
-      #keep only the necessary chatlines
-      @pages = @pages[start_pos...end_pos]
+        #keep only the necessary chatlines
+        @pages = @pages[start_pos...end_pos]
+      end
     end
   end
 
