@@ -211,7 +211,7 @@ var Chat = function(id, player, type, start, end) {
 			featuresField =  "<span class='features'>" + flairList + "</span>";
 		}
 		if (username) {
-			usernameField = `<span onclick='document._addFocusRule("${username}")' class='user-${username} user ${featuresList}'>${username}</span>: `;
+			usernameField = `<span onclick='document._addFocusRule("${username}")' class='user-${username} user ${featuresList}'>${username}</span><span class='message-divider'>:</span> `;
 		}
 
 		self.chatStream.append("<div class='chat-line' data-username='" + username + "'>" + 

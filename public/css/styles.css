@@ -464,6 +464,10 @@ body {
 	color: #999999;
 }
 
+.chat-line .message-divider {
+	vertical-align: middle;
+}
+
 .chat-line .emote {
 	background-repeat: no-repeat;
 	display: inline-block;
@@ -471,7 +475,7 @@ body {
 	z-index: 1;
 	overflow: hidden;
 	text-indent: -90000px;
-	vertical-align: middle;
+	vertical-align: bottom;
 }
 
 .chat-line a.externallink {
