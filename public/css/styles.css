@@ -167,6 +167,10 @@ body {
 	opacity: 100%;
 }
 
+#scoot-credit-link {
+	color: white;
+}
+
 #table-container {
 	overflow: hidden;
 }
