@@ -270,9 +270,21 @@ var Chat = function(id, player, type, start, end) {
 		}
 	}); 
 
-	window.setInterval(function() {
-		self.chatonlyCounter += 0.5;
+	$("#pause-controls").click(function() {
+		if (self.status === "running") {
+			$("#pause-controls").text("Start chat")
+			self.status = "paused";
+			clearInterval(self.chatInterval)
+		} else if (self.status === "paused") {
+			$("#pause-controls").text("Stop chat")
+			self.status = "running";
+			self.chatInterval = window.setInterval(function() {self.chatFunction()}, 500);
+		}
+	});
+
+	self.chatFunction = function() {
 		if (self.status == "running" && self.chat) {
+			self.chatonlyCounter += 0.5;
 			var currentTimeOffset = (self.playerType === "chatonly") ? Math.floor(self.chatonlyCounter) : Math.floor(self.videoPlayer.getCurrentTime());
 			var utcFormat = [];
 			var timestamps = [];
@@ -330,7 +342,9 @@ var Chat = function(id, player, type, start, end) {
 			self.previousTimeOffset = currentTimeOffset;
 
 		}
-	}, 500);
+	}
+
+	self.chatInterval = window.setInterval(function() {self.chatFunction()}, 500);
 };
 
 // From https://stackoverflow.com/a/3890175
