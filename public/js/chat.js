@@ -20,6 +20,7 @@ var Chat = function(id, player, type, start, end) {
 	this.actualPreviousTimeOffset = -1;
 	this.previousMessage = '';
 	this.comboCount = 1;
+	this.bottomDetector = true;
 
 	this.chatonlyCounter = 0;
 
@@ -261,6 +262,14 @@ var Chat = function(id, player, type, start, end) {
 		self.actualPreviousTimeOffset = 0
 	}
 
+	$('#chat-stream').on('scroll', function() { 
+		if ($(this).scrollTop() + $(this).innerHeight() >=  $(this)[0].scrollHeight) { 
+			self.bottomDetector = true;
+		} else {
+			self.bottomDetector = false;
+		}
+	}); 
+
 	window.setInterval(function() {
 		self.chatonlyCounter += 0.5;
 		if (self.status == "running" && self.chat) {
@@ -299,10 +308,11 @@ var Chat = function(id, player, type, start, end) {
 						}
 	
 						self.previousMessage = chatLine.message;
-
-						self.chatStream.animate({
-							scrollTop: self.chatStream.prop("scrollHeight")
-						}, 0);
+						if (self.bottomDetector) {
+							self.chatStream.animate({
+								scrollTop: self.chatStream.prop("scrollHeight")
+							}, 0);
+						}
 					});
 				});
 
